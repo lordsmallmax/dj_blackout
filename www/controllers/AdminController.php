@@ -7,6 +7,11 @@ use yii\web\Controller;
 use yii\filters\AccessControl;
 use yii\web\ForbiddenHttpException;
 use app\models\User;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Label\Font\NotoSans;
 
 class AdminController extends Controller
 {
@@ -42,7 +47,10 @@ class AdminController extends Controller
         throw new \yii\web\ForbiddenHttpException('Zugriff verweigert.');
     }
 
-        return $this->render('music-lists');
+        $users = \app\models\User::find()->all();
+        return $this->render('music-lists', [
+            'users' => $users
+        ]);
     }
 
     public function actionSongRequests()
@@ -56,4 +64,27 @@ class AdminController extends Controller
     return $this->render('song-requests', ['requests' => $requests]);
     }
 
+    public function actionQrCode($eventId)
+    {
+        $event = Event::findOne($eventId);
+        if (!$event) {
+            throw new \yii\web\NotFoundHttpException('Event nicht gefunden.');
+        }
+    $url = Yii::$app->urlManager->createAbsoluteUrl(['site/song-request', 'slug' => $event->slug]);
+
+    $result = Builder::create()
+        ->data($url)
+        ->encoding(new Encoding('UTF-8'))
+        ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+        ->size(300)
+        ->margin(10)
+        ->labelText($event->name)
+        ->labelFont(new NotoSans(20))
+        ->build();
+
+    // Direkt als PNG anzeigen
+    Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+    Yii::$app->response->headers->add('Content-Type', 'image/png');
+    return $result->getString();
+    } 
 }

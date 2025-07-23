@@ -4,11 +4,13 @@ use yii\bootstrap5\Html;
 
 /** @var yii\web\View $this */
 /** @var app\models\SongRequest $model */
+/** @var app\models\Event $event */
 
-$this->title = 'Musikwunsch einreichen';
+$this->title = 'Musikwunsch für: ' . $event->name;
 ?>
 <div class="site-song-request">
     <h1><?= Html::encode($this->title) ?></h1>
+    <p>Du wünschst für das Event: <strong><?= Html::encode($event->name) ?></strong></p>
     <p>Wünsch dir was! 🎶</p>
 
     <?php if (Yii::$app->session->hasFlash('success')): ?>

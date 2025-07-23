@@ -60,4 +60,9 @@ class SongRequest extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getEvent()
+    {
+        return $this->hasOne(Event::class, ['id' => 'event_id']);
+    }
+
 }

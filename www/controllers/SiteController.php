@@ -9,6 +9,8 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\MusicList;
+use app\models\Event;
 
 class SiteController extends Controller
 {
@@ -167,15 +169,62 @@ class SiteController extends Controller
         return $this->render('confirm-admin', ['model' => $model]);
     }
 
-    public function actionSongRequest() 
+    public function actionSongRequest($slug) 
     {
         $model = new \app\models\song_request();
+        $event = Event::findOne(['slug' => $slug]);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
         Yii::$app->session->setFlash('success', 'Dein Wunsch wurde gespeichert!');
-        return $this->refresh();
+            return $this->refresh();
+    }
+    return $this->render('song-request', ['model' => $model]);
+
+        if (!$event) {
+            throw new \yii\web\NotFoundHttpException('Event nicht gefunden.');
+        }
+        $model = new SongRequest();
+        $model->event_id = $event->id;
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', 'Dein Musikwunsch wurde gespeichert!');
+            return $this->refresh();
+        }
+        return $this->render('song-request', [
+            'model' => $model,
+            'event' => $event
+            ]);
+
     }
 
-        return $this->render('song-request', ['model' => $model]);
+    public function actionMyMusicList()
+    {
+        $userId = Yii::$app->user->id;
+
+        $musicList = MusicList::find()
+            ->where(['user_id' => $userId])
+            ->with('event')
+            ->all();
+
+        return $this->render('my-music-list', [
+            'musicList' => $musicList
+        ]);
+    }
+
+    public function actionAddMusic()
+    {
+        $model = new MusicList();
+        $events = Event::find()->where (['is_active' => 1])->all();
+        $eventItems = \yii\helpers\ArrayHelper::map($events, 'id', 'name');
+
+        if ($model->load(Yii::$app->request->post())) {
+            $model-> user_id = Yii::$app->user->id;
+            $model->save();
+            Yii::$app->session->setFlash('success', 'Vielen Dank, dein Musikreintrag wurde gespeichert!');
+            return $this->redirect(['site/my-music-list']);
+        }
+        return $this->render('add-music', [
+            'model' => $model,
+            'eventItems' => $eventItems
+        ]);
     }
 }

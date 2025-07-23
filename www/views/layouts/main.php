@@ -50,6 +50,14 @@ $this->registerCss("
         'options' => ['class' => 'navbar navbar-expand-md navbar-dark blackout-navbar fixed-top']
     ]);
 
+    $userEvents = [];
+        if (!Yii::$app->user->isGuest) {
+            $userEvents = \app\models\Event::find()
+            ->where(['user_id' => Yii::$app->user->id, 'is_active' => 1])
+            ->orderBy(['date' => SORT_DESC])
+            ->all();
+        }
+
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav ms-auto'],
         'items' => array_merge(
@@ -57,6 +65,15 @@ $this->registerCss("
                 ['label' => 'Home', 'url' => ['/site/index']],
                 ['label' => 'About', 'url' => ['/site/about']],
                 ['label' => 'Contact', 'url' => ['/site/contact']],
+                ['label' => 'Events', 'url' => ['/site/events']],
+                ['label' => 'Song Requests',
+                    'items' => array_map(function ($event) {
+                        return [
+                        'label' => $event->name,
+                        'url' => ['/site/song-request', 'slug' => $event->slug],
+                        ];
+                    }, $userEvents)],
+                ['label' => 'Musikübersicht', 'url' => ['/site/my-music-list']],
             ],
             Yii::$app->user->isGuest ? 
                  [

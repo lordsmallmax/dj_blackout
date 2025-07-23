@@ -24,7 +24,7 @@ $this->title = 'Musikwünsche';
             <tr>
                 <td><?= Html::encode($req->created_at) ?></td>
                 <td><?= Html::encode($req->name) ?></td>
-                <td><?= Html::encode($req->song_title) ?></td>
+                <td><?= Html::encode($req->title) ?></td>
                 <td><?= Html::encode($req->artist) ?></td>
                 <td><?= Html::encode($req->genre) ?></td>
                 <td><?= Html::encode($req->comment) ?></td>

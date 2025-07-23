@@ -1,11 +1,12 @@
 <?php
 use yii\helpers\Html;
+/** @var app\models\User[] $users */
 
 $this->title = 'Musikübersicht';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<h1>Benutzerübersicht</h1>
+<h1>Musikübersicht</h1>
 
 <table class="table table-dark table-striped">
     <thead>

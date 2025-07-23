@@ -48,6 +48,8 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'song-request/<slug>' => 'site/song-request',
+                'qr-code/<eventId:\d+>' => 'admin/qr-code',
             ],
         ],
         
